@@ -3,10 +3,6 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-//TODO:
-// 1. AMke board start at 1
-// 2. Make the board shift to the right
-// 3. Make the getNegibesr non-edge cells
 
 public class HexGame {
     private static final int BOARD_SIZE = 11;
@@ -33,7 +29,6 @@ public class HexGame {
         }
 
         board[cell] = color;
-        System.out.println(color + " moves to cell " + cell + ".");
         moveCount++;
 
         // Union the cell with its neighbors of the same color
@@ -68,7 +63,6 @@ public class HexGame {
         System.out.println(currentPlayer + " checking win...");
 
         // Check if left and right are in the same set by union find if they are they win
-        System.out.println(uf.toString());
         if (currentPlayer == CellColor.BLUE && uf.find(LEFT) == uf.find(RIGHT)) {
             return true;
         } else if (currentPlayer == CellColor.RED && uf.find(TOP) == uf.find(BOTTOM)) {
@@ -82,23 +76,22 @@ public class HexGame {
 
     private int[] getNeighbors(int item) {
         int[] neighbors;
-        boolean isLeftEdge = item % BOARD_SIZE == 0;
-        boolean isRightEdge = (item + 1) % BOARD_SIZE == 0;
-        boolean isTopRow = item >= 1 && item <= BOARD_SIZE;
-        boolean isBottomRow = item >= TOTAL_CELLS - BOARD_SIZE + 1 && item <= TOTAL_CELLS;
-
+        boolean isLeftEdge = item % BOARD_SIZE == 1 ; // 23%11 = 1
+        boolean isRightEdge = item % BOARD_SIZE == 0; // 22%11 = 0
+        boolean isTopRow = item <= BOARD_SIZE; // 11*11
+        boolean isBottomRow = item >= TOTAL_CELLS - BOARD_SIZE; // Simplified condition
         if (isTopRow) {
             neighbors = isLeftEdge ? new int[]{item + 1, item + BOARD_SIZE} :
                     isRightEdge ? new int[]{item - 1, item + BOARD_SIZE - 1} :
                             new int[]{item - 1, item + 1, item + BOARD_SIZE - 1, item + BOARD_SIZE, item + BOARD_SIZE + 1};
         } else if (isBottomRow) {
-            neighbors = isLeftEdge ? new int[]{item + 1, item - BOARD_SIZE + 1} :
+            neighbors = isLeftEdge ? new int[]{item + 1, item - BOARD_SIZE} :
                     isRightEdge ? new int[]{item - 1, item - BOARD_SIZE} :
-                            new int[]{item - 1, item + 1, item - BOARD_SIZE, item - BOARD_SIZE + 1, item - BOARD_SIZE + 1};
+                            new int[]{item - 1, item + 1, item - BOARD_SIZE - 1, item - BOARD_SIZE, item - BOARD_SIZE + 1};
         } else {
             neighbors = isLeftEdge ? new int[]{item - BOARD_SIZE, item + 1, item + BOARD_SIZE} :
                     isRightEdge ? new int[]{item - BOARD_SIZE, item - 1, item + BOARD_SIZE} :
-                            new int[]{item - BOARD_SIZE, item - BOARD_SIZE + 1, item - 1, item + 1, item + BOARD_SIZE - 1, item + BOARD_SIZE};
+                            new int[]{item - BOARD_SIZE, item - BOARD_SIZE + 1, item - 1, item + 1, item + BOARD_SIZE - 1, item + BOARD_SIZE, item + BOARD_SIZE + 1};
         }
 
         // Print the neighbors
@@ -111,6 +104,7 @@ public class HexGame {
         return neighbors;
     }
 
+
     public void printBoard() {
         System.out.println("Current Board State:");
 
@@ -122,15 +116,14 @@ public class HexGame {
             }
 
             for (int col = 1; col <= rowLength; col++) {
-                int index = row * rowLength + col;
-                // Adjust the index to shift the board to the left
-                int adjustedIndex = index - row;
+                int adjustedIndex = row * rowLength + (col - 1);
                 printCell(board[adjustedIndex]);
             }
             System.out.println();
         }
         System.out.println();
     }
+
 
     private void printCell(CellColor color) {
         String colorCode;
@@ -170,7 +163,7 @@ public class HexGame {
 
     public static void main(String[] args) {
 //        String[] files = {"moves.txt", "moves2.txt"};
-        String[] files = {"moves.txt"};
+        String[] files = {"moves2.txt"};
         for (String fileName : files) {
             System.out.println("Processing file: " + fileName);
             HexGame game = new HexGame();
